@@ -1,34 +1,47 @@
 import streamlit as st
 
-st.set_page_config(page_title="Friday Night at the ER", layout="wide")
+st.set_page_config(
+    page_title="Friday Night at the ER",
+    page_icon="🏥",
+    layout="wide"
+)
 
-st.title("🏥 Friday Night at the ER")
-st.subheader("Team Performance Dashboard")
+GAME_LOGO = "1548433148198.png"
+COMPANY_LOGO = "PHI-Air-Med_logo-2023.jpg"
 
-col1, col2, col3, col4, col5 = st.columns(5)
+st.markdown("""
+<style>
+.stApp {
+    background-color: #0f0f0f;
+    color: white;
+}
 
-with col1:
-    st.metric("Team A", "0", "Quality")
-    st.metric("Cost", "$0")
+.hero {
+    background: linear-gradient(135deg, #000000, #2b2b2b);
+    padding: 40px;
+    border-radius: 20px;
+    border: 3px solid #f5c400;
+    text-align: center;
+}
 
-with col2:
-    st.metric("Team B", "0", "Quality")
-    st.metric("Cost", "$0")
+.card {
+    background-color: #1c1c1c;
+    padding: 25px;
+    border-radius: 16px;
+    border-left: 6px solid #f5c400;
+    color: white;
+    box-shadow: 0 4px 15px rgba(245,196,0,0.25);
+}
 
-with col3:
-    st.metric("Team C", "0", "Quality")
-    st.metric("Cost", "$0")
+h1, h2, h3 {
+    color: #f5c400;
+}
 
-with col4:
-    st.metric("Team D", "0", "Quality")
-    st.metric("Cost", "$0")
-
-with col5:
-    st.metric("Team E", "0", "Quality")
-    st.metric("Cost", "$0")
-
-st.divider()
-
-st.header("Results")
-
-st.info("Prototype dashboard successfully deployed.")
+div.stButton > button {
+    background-color: #f5c400;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
