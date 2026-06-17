@@ -16,7 +16,7 @@ if "splash_done" not in st.session_state:
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(135deg, #000000 0%, #1c1c1c 60%, #ffffff 100%);
+    background: radial-gradient(circle at top, #2b2b2b 0%, #111111 45%, #000000 100%);
     color: white;
 }
 
@@ -24,52 +24,98 @@ st.markdown("""
     padding-top: 2rem;
 }
 
-.splash-box {
-    background-color: #ffffff;
-    padding: 45px;
-    border-radius: 24px;
+.splash-wrapper {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-top: 40px;
     text-align: center;
-    border: 5px solid #f5c400;
-    box-shadow: 0 0 30px rgba(245, 196, 0, 0.45);
+}
+
+.logo-card {
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 30px;
+    border: 3px solid #f5c400;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.45);
+}
+
+.company-logo {
+    background: white;
+    border-radius: 14px;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 22px;
+}
+
+.splash-title {
+    color: #f5c400;
+    font-size: 30px;
+    font-weight: 800;
+    margin-top: 28px;
+}
+
+.splash-subtitle {
+    color: #ffffff;
+    font-size: 16px;
+    margin-top: 6px;
+}
+
+.heartbeat {
+    color: #f5c400;
+    font-size: 30px;
+    letter-spacing: 3px;
+    margin-top: 20px;
+    animation: pulse 1.2s infinite;
+}
+
+.loading-text {
+    color: #ffffff;
+    font-size: 15px;
+    margin-top: 12px;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.35; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.03); }
+    100% { opacity: 0.35; transform: scale(0.98); }
 }
 
 .hero {
-    background: linear-gradient(90deg, #000000, #252525);
-    padding: 30px;
-    border-radius: 20px;
+    background: linear-gradient(90deg, #000000, #262626);
+    padding: 28px;
+    border-radius: 18px;
     border-left: 10px solid #f5c400;
     margin-bottom: 25px;
 }
 
 .hero h1 {
     color: #f5c400;
-    font-size: 44px;
+    font-size: 42px;
     margin-bottom: 5px;
 }
 
 .hero p {
     color: white;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .card {
-    background-color: #ffffff;
+    background: #ffffff;
     color: #000000;
     padding: 22px;
-    border-radius: 18px;
-    border-top: 8px solid #f5c400;
+    border-radius: 16px;
+    border-top: 7px solid #f5c400;
     box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     text-align: center;
 }
 
 .card h3 {
     color: #000000;
-    margin-bottom: 10px;
 }
 
 .metric-value {
-    color: #f5c400;
-    font-size: 34px;
+    color: #000000;
+    font-size: 30px;
     font-weight: 800;
 }
 
@@ -82,26 +128,37 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# -----------------------------
 # Splash screen
+# -----------------------------
 if not st.session_state.splash_done:
-    col1, col2, col3 = st.columns([1, 2, 1])
+    st.markdown("""
+    <div class="splash-wrapper">
+        <div class="logo-card">
+    """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown('<div class="splash-box">', unsafe_allow_html=True)
-        st.image(GAME_LOGO, use_container_width=True)
-        st.image(COMPANY_LOGO, width=280)
-        st.markdown(
-            "<h2 style='color:#000000;'>New Hire Scoring Dashboard</h2>",
-            unsafe_allow_html=True
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.image(GAME_LOGO, width=520)
+
+    st.markdown('<div class="company-logo">', unsafe_allow_html=True)
+    st.image(COMPANY_LOGO, width=210)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+        </div>
+        <div class="splash-title">New Hire Simulation Dashboard</div>
+        <div class="splash-subtitle">Powered by PHI Air Medical</div>
+        <div class="heartbeat">▁▂▃▅▇▅▃▂▁  Initializing  ▁▂▃▅▇▅▃▂▁</div>
+        <div class="loading-text">Loading dashboard...</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     time.sleep(2)
     st.session_state.splash_done = True
     st.rerun()
 
+# -----------------------------
 # Home screen
+# -----------------------------
 else:
     st.markdown("""
     <div class="hero">
@@ -128,4 +185,4 @@ else:
             """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">Dashboard Preview</div>', unsafe_allow_html=True)
-    st.info("Next step: add score inputs, automatic calculations, rankings, and chart.")
+    st.info("Next step: add score inputs, calculations, rankings, and chart.")
