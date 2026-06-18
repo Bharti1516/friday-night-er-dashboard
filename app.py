@@ -1,145 +1,193 @@
-import streamlit as st
-import time
 import base64
+import time
+from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+
 
 st.set_page_config(
-    page_title="Friday Night at the ER",
-    page_icon="🏥",
-    layout="wide"
+    page_title="PHI New Hire Scoring Dashboard",
+    page_icon=":bar_chart:",
+    layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
-GAME_LOGO = "1548433148198.png"
-COMPANY_LOGO = "PHI-Air-Med_logo-2023.jpg"
 
-def image_to_base64(path):
-    with open(path, "rb") as img:
-        return base64.b64encode(img.read()).decode()
+APP_DIR = Path(__file__).parent
+GAME_LOGO = APP_DIR / "1548433148198.png"
+COMPANY_LOGO = APP_DIR / "PHI-Air-Med_logo-2023.jpg"
+GOLD_LOGO = APP_DIR / "images.png"
+
+
+def image_to_base64(path: Path) -> str:
+    return base64.b64encode(path.read_bytes()).decode("utf-8")
+
 
 game_logo_b64 = image_to_base64(GAME_LOGO)
 company_logo_b64 = image_to_base64(COMPANY_LOGO)
+gold_logo_b64 = image_to_base64(GOLD_LOGO)
+
+
+TEAM_SCORES = pd.DataFrame(
+    {
+        "Team": ["Team A", "Team B", "Team C", "Team D", "Team E"],
+        "Patients Served": [0, 0, 0, 0, 0],
+        "Quality Errors": [0, 0, 0, 0, 0],
+        "Total Cost": [0, 0, 0, 0, 0],
+        "Score": [0, 0, 0, 0, 0],
+    }
+)
+
+
+def inject_styles() -> None:
+        unsafe_allow_html=True,
+    )
+
+
+def show_splash() -> None:
+    st.markdown(
+        f"""
+        <div class="splash-screen">
+            <div class="splash-panel">
+                <div class="splash-logo-row">
+                    <div class="splash-logo-card">
+                        <img src="data:image/png;base64,{game_logo_b64}" alt="Friday Night at the ER logo">
+                    </div>
+                    <div class="splash-logo-card">
+                        <img src="data:image/jpeg;base64,{company_logo_b64}" alt="PHI Air Medical logo">
+                    </div>
+                </div>
+                <div class="splash-kicker">PHI Air Medical New Hire Experience</div>
+                <h1 class="splash-title">Scoring Dashboard</h1>
+                <p class="splash-subtitle">Loading the monthly board game command center</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def metric_tile(label: str, value: str, note: str) -> str:
+    return f"""
+    <div class="metric-tile">
+        <div class="metric-label">{label}</div>
+        <div class="metric-number">{value}</div>
+        <div class="metric-note">{note}</div>
+    </div>
+    """
+
+
+def team_card(team: str, score: int, errors: int, cost: int) -> str:
+    return f"""
+    <div class="team-card">
+        <h3>{team}</h3>
+        <div class="score-row">
+            <span class="score-label">Score</span>
+            <span class="score-value">{score}</span>
+        </div>
+        <div class="score-row">
+            <span class="score-label">Quality Errors</span>
+            <span class="score-value">{errors}</span>
+        </div>
+        <div class="score-row">
+            <span class="score-label">Total Cost</span>
+            <span class="score-value">${cost:,}</span>
+        </div>
+    </div>
+    """
+
+
+def show_home() -> None:
+    st.markdown(
+        f"""
+        <div class="home-shell">
+            <div class="topbar">
+                <div class="brand-lockup">
+                    <div class="brand-mark">
+                        <img src="data:image/png;base64,{gold_logo_b64}" alt="PHI Air Medical mark">
+                    </div>
+                    <div>
+                        <p class="brand-title">PHI Air Medical</p>
+                        <p class="brand-subtitle">Friday Night at the ER scoring suite</p>
+                    </div>
+                </div>
+                <div class="month-pill">Monthly New Hire Session</div>
+            </div>
+
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="eyebrow">Professional scoring dashboard</div>
+                    <h1>Friday Night at the ER</h1>
+                    <p>
+                        Capture monthly team results, track quality and cost performance, and review
+                        the final leaderboard from one clean PHI-branded workspace.
+                    </p>
+                </div>
+            </section>
+
+            <div class="metric-strip">
+                {metric_tile("Teams", "5", "Ready for monthly scoring")}
+                {metric_tile("Current Leader", "--", "Scores have not been entered")}
+                {metric_tile("Total Errors", "0", "Across all teams")}
+                {metric_tile("Total Cost", "$0", "Calculated automatically")}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    entry_col, export_col, reset_col, spacer_col = st.columns([1.3, 1.3, 1.1, 3.3])
+    with entry_col:
+        st.button("Add Monthly Scores", use_container_width=True)
+    with export_col:
+        st.button("Export Score Sheet", use_container_width=True)
+    with reset_col:
+        st.button("Reset Session", use_container_width=True)
+
+    st.markdown(
+        """
+        <div class="section-head">
+            <div>
+                <h2>Team Scoreboard</h2>
+                <p>Initial layout for team score entry, calculation, and ranking.</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    cards = "".join(
+        team_card(row["Team"], row["Score"], row["Quality Errors"], row["Total Cost"])
+        for row in TEAM_SCORES.to_dict("records")
+    )
+    st.markdown(f'<div class="team-grid">{cards}</div>', unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <div class="section-head">
+            <div>
+                <h2>Final Score Graph</h2>
+                <p>The chart is ready for live scoring data in the next build step.</p>
+            </div>
+        </div>
+        <div class="chart-panel">
+        """,
+        unsafe_allow_html=True,
+    )
+    st.bar_chart(TEAM_SCORES.set_index("Team")[["Score"]], height=300)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+inject_styles()
 
 if "splash_done" not in st.session_state:
     st.session_state.splash_done = False
 
-st.markdown("""
-<style>
-.stApp {
-    background-color: #f5f6f8;
-}
-
-.block-container {
-    padding-top: 0rem;
-    max-width: 100%;
-}
-
-.splash-screen {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.splash-content {
-    text-align: center;
-}
-
-.game-logo {
-    width: 420px;
-    max-width: 90%;
-    margin-bottom: 28px;
-}
-
-.company-logo {
-    width: 190px;
-    max-width: 60%;
-    margin-bottom: 25px;
-}
-
-.splash-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: #111111;
-}
-
-.splash-subtitle {
-    font-size: 15px;
-    color: #666666;
-    margin-top: 8px;
-}
-
-.app-header {
-    background-color: #111111;
-    border-bottom: 6px solid #f5c400;
-    padding: 24px 30px;
-    border-radius: 16px;
-    color: white;
-    margin-bottom: 28px;
-}
-
-.app-header h1 {
-    color: #f5c400;
-    font-size: 38px;
-    margin-bottom: 4px;
-}
-
-.card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    padding: 22px;
-    border: 1px solid #e5e7eb;
-    border-top: 6px solid #f5c400;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    text-align: center;
-}
-
-.metric-value {
-    color: #111111;
-    font-size: 30px;
-    font-weight: 800;
-}
-</style>
-""", unsafe_allow_html=True)
-
 if not st.session_state.splash_done:
-    st.markdown(f"""
-    <div class="splash-screen">
-        <div class="splash-content">
-            <img class="game-logo" src="data:image/png;base64,{game_logo_b64}">
-            <br>
-            <img class="company-logo" src="data:image/jpg;base64,{company_logo_b64}">
-            <div class="splash-title">New Hire Team Scoring Dashboard</div>
-            <div class="splash-subtitle">Powered by PHI Air Medical</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
+    show_splash()
     time.sleep(2)
     st.session_state.splash_done = True
     st.rerun()
 
-else:
-    st.markdown("""
-    <div class="app-header">
-        <h1>Friday Night at the ER</h1>
-        <p>New Hire Team Scoring Dashboard</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    teams = ["Team A", "Team B", "Team C", "Team D", "Team E"]
-    cols = st.columns(5)
-
-    for col, team in zip(cols, teams):
-        with col:
-            st.markdown(f"""
-            <div class="card">
-                <h3>{team}</h3>
-                <p>Quality Errors</p>
-                <div class="metric-value">0</div>
-                <p>Total Cost</p>
-                <div class="metric-value">$0</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    st.divider()
-    st.subheader("Dashboard Preview")
-    st.info("Next step: score inputs, calculations, rankings, and chart.")
+show_home()
